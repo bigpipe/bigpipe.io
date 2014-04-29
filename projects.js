@@ -1,6 +1,7 @@
 'use strict';
 
-var read = require('fs').readFileSync
+var Pagelet = require('bigpipe').Pagelet
+  , read = require('fs').readFileSync
   , lexer = require('marked').lexer
   , renderme = require('renderme')
   , path = require('path');
@@ -21,6 +22,8 @@ function Source(name) {
   this.tableofcontents = null;
   this.name = name;
   this.html = '';
+
+  this.toc();
 }
 
 /**
@@ -53,11 +56,10 @@ Source.prototype.render = function render(fn) {
 /**
  * Generate a Table of contents if none is available.
  *
- * @param {Function} fn
  * @api private
  */
-Source.prototype.toc = function toc(fn) {
-  if (this.tableofcontents) return fn(undefined, this.tableofcontents);
+Source.prototype.toc = function toc() {
+  if (this.tableofcontents) return;
 
   var navigation = lexer(this.content).filter(function filter(token) {
     return token.type === 'heading' && (token.depth === 2 || token.depth === 3);
@@ -89,11 +91,8 @@ Source.prototype.toc = function toc(fn) {
   //
   // If we an table of contents, we should just use that.
   //
-  if ('table-of-contents' in ticktoc) {
-    ticktoc = ticktoc['table-of-contents'];
-  }
-
-  fn(undefined, (this.tableofcontents = ticktoc));
+  if ('table-of-contents' in ticktoc) ticktoc = ticktoc['table-of-contents'];
+  if (Object.keys(ticktoc).length) this.tableofcontents = ticktoc;
 };
 
 /**
@@ -105,10 +104,34 @@ Source.prototype.toc = function toc(fn) {
 Source.components = {
   'bigpipe': new Source('bigpipe'),
   'pagelet': new Source('pagelet'),
-  'pipe.js': new Source('pipe.js')
+  'client': new Source('pipe.js')
 };
 
+/**
+ * A general Source pagelet which will correctly render the README files.
+ *
+ * @type {Pagelet}
+ * @api private
+ */
+Source.Pagelet = Pagelet.extend({
+  view: 'project.ejs',
+  css:  'project.styl',
+
+  get: function get(next) {
+    var project = Source.components[this.component]
+      , pagelet = this;
+
+    project.render(function render(err, html) {
+      next(err, {
+        README: html,
+        project: project
+      });
+    });
+  }
+}).on(module);
+
 //
-// Things.
+// Things that should be exposed, should be called before `Source.Pagelet.on` so
+// we can override the module.exports again.
 //
 module.exports = Source;

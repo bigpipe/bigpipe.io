@@ -26,6 +26,7 @@
     "bigpipe": "git://github.com/bigpipe/bigpipe",
     "renderme": "0.0.11",
     "marked": "^0.3.2",
-    "ejs": "^1.0.0"
+    "ejs": "^1.0.0",
+    "async": "^0.7.0"
   }
 }

@@ -1,3 +1,24 @@
 <aside class="sidebar">
+  <dl>
+    <dt>BigPipe</dt>
+  </dl>
 
+  <% 
+    Object.keys(components).forEach(function each(name) { 
+    project = components[name];
+  %>
+  <h3>
+    <%= name %>
+    <small title="This documentation is for this version of the module"><%= project.json.version %></small>
+  </h3>
+  <% if (project.tableofcontents) { %>
+  <ul>
+    <% project.tableofcontents.sections.forEach(function (menu) { %>
+    <li>
+      <a href="#<%= menu.id %>" class="item"><%= menu.name %></a>
+    </li>
+    <% }); %>
+  </ul>
+  <% } %>
+  <% }); %>
 </aside>
