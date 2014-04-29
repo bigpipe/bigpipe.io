@@ -13,7 +13,10 @@ var Pagelet = require('bigpipe').Pagelet
  * @param {String} name The name of module who's README.
  * @api private
  */
-function Source(name) {
+function Source(name, remove) {
+  if (!(this instanceof Source)) return new Source(name, remove);
+
+  remove = remove || [];
   var directory = path.dirname(require.resolve(name));
 
   this.json = require(path.join(directory, 'package.json'));
@@ -23,7 +26,7 @@ function Source(name) {
   this.name = name;
   this.html = '';
 
-  this.toc();
+  this.toc().remove(remove);
 }
 
 /**
@@ -54,12 +57,60 @@ Source.prototype.render = function render(fn) {
 };
 
 /**
+ * There are parts in this content that we don't really need. We should remove
+ * these whole sections. We assume that these sections are separated by headers
+ * of their same size.
+ *
+ * @param {Array} headers Sections that need to be removed
+ * @returns {Source}
+ * @api private
+ */
+Source.prototype.remove = function remove(headers) {
+  var lines = this.content.split(/\n/g)
+    , removal = Array(10).join('@_@-<3>-@_@')
+    , indexes = {};
+
+  //
+  // First we're going to catalog all the locations/indexes of each header.
+  //
+  lines.forEach(function each(line, index) {
+    line = line.trim();
+
+    if (/^\#+/.test(line)) indexes[line.toLowerCase()] = index;
+  });
+
+  headers.forEach(function each(section) {
+    section = section.toLowerCase();
+
+    Object.keys(indexes).forEach(function each(header, index, all) {
+      if (!~header.indexOf(section)) return;
+
+      var last = indexes[all[index + 1]] || lines.length
+        , start = indexes[header];
+
+      while (start < last) {
+        //
+        // Don't move potential [name]: http://url lines or we will break URLS.
+        //
+        if (!/\^\[\w\]\:/.test(lines[start])) lines[start] = removal;
+        start++;
+      }
+    });
+  });
+
+  this.content = lines.filter(function filter(line) {
+    return line !== removal;
+  }).join('\n');
+};
+
+/**
  * Generate a Table of contents if none is available.
  *
+ * @returns {Source}
  * @api private
  */
 Source.prototype.toc = function toc() {
-  if (this.tableofcontents) return;
+  if (this.tableofcontents) return this;
 
   var navigation = lexer(this.content).filter(function filter(token) {
     return token.type === 'heading' && (token.depth === 2 || token.depth === 3);
@@ -93,6 +144,8 @@ Source.prototype.toc = function toc() {
   //
   if ('table-of-contents' in ticktoc) ticktoc = ticktoc['table-of-contents'];
   if (Object.keys(ticktoc).length) this.tableofcontents = ticktoc;
+
+  return this;
 };
 
 /**
@@ -102,9 +155,9 @@ Source.prototype.toc = function toc() {
  * @api private
  */
 Source.components = {
-  'bigpipe': new Source('bigpipe'),
-  'pagelet': new Source('pagelet'),
-  'client': new Source('pipe.js')
+  'bigpipe': new Source('bigpipe', ['license', 'testing', 'table of contents']),
+  'pagelet': new Source('pagelet', ['installation', 'license', 'table of contents']),
+  'client': new Source('pipe.js', ['installation', 'license', 'table of contents'])
 };
 
 /**
