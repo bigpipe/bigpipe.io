@@ -4,7 +4,8 @@
   "description": "The documentation site on http://bigpipe.io",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -24,9 +25,12 @@
     "pipe.js": "git://github.com/bigpipe/pipe.js",
     "pagelet": "git://github.com/bigpipe/pagelet",
     "bigpipe": "git://github.com/bigpipe/bigpipe",
-    "renderme": "0.0.11",
-    "marked": "^0.3.2",
-    "ejs": "^1.0.0",
-    "async": "^0.7.0"
+    "renderme": "0.1.x",
+    "marked": "0.3.x",
+    "ejs": "1.0.x"
+  },
+  "subdomain": "bigpipe",
+  "engines": {
+    "node": "0.10.x"
   }
 }
