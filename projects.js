@@ -92,7 +92,10 @@ Source.prototype.remove = function remove(headers) {
         //
         // Don't move potential [name]: http://url lines or we will break URLS.
         //
-        if (!/\^\[\w\]\:/.test(lines[start])) lines[start] = removal;
+        if (!/^\[\w+\]\:/.test(lines[start])) {
+          lines[start] = removal;
+        }
+
         start++;
       }
     });
