@@ -1,6 +1,6 @@
 {
   "name": "bigpipe.io",
-  "version": "0.0.0",
+  "version": "0.0.0-2",
   "description": "The documentation site on http://bigpipe.io",
   "main": "index.js",
   "scripts": {

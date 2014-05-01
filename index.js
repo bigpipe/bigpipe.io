@@ -1,8 +1,8 @@
 'use strict';
 
 var bigpipe = require('bigpipe').createServer(8080, {
-  pages: __dirname +'/pages',
-  dist:  __dirname +'/dist'
+  dist:  __dirname +'/dist',
+  pages: __dirname +'/pages'
 });
 
 bigpipe.once('listening', function listening() {

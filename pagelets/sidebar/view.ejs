@@ -1,14 +1,10 @@
 <aside class="sidebar">
-  <dl>
-    <dt>BigPipe</dt>
-  </dl>
-
   <% 
     Object.keys(components).forEach(function each(name) { 
     project = components[name];
   %>
   <h3>
-    <%= name %>
+    <a href="#<%= name %>"><%= name %></a>
     <small title="This documentation is for this version of the module"><%= project.json.version %></small>
   </h3>
   <% if (project.tableofcontents) { %>
