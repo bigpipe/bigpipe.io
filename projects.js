@@ -1,16 +1,23 @@
 'use strict';
 
 var Pagelet = require('bigpipe').Pagelet
-  , read = require('fs').readFileSync
   , lexer = require('marked').lexer
   , renderme = require('renderme')
-  , path = require('path');
+  , path = require('path')
+  , fs = require('fs');
+
+//
+// Cache sync functions, we don't care about the rest.
+//
+var write = fs.writeFileSync
+  , read = fs.readFileSync;
 
 /**
  * The representation of a single README source.
  *
  * @constructor
  * @param {String} name The name of module who's README.
+ * @param {Array} remove README sections that should be removed.
  * @api private
  */
 function Source(name, remove) {
@@ -20,11 +27,14 @@ function Source(name, remove) {
   var directory = path.dirname(require.resolve(name));
 
   this.json = require(path.join(directory, 'package.json'));
+  this.cache = path.join(__dirname, 'cache', name +'.html');
   this.file = path.join(directory, 'README.md');
   this.content = read(this.file, 'utf-8');
   this.tableofcontents = null;
   this.name = name;
-  this.html = '';
+
+  try { this.html = read(this.cache, 'utf-8'); }
+  catch (e) { this.html = ''; }
 
   this.toc().remove(remove);
 }
@@ -51,6 +61,7 @@ Source.prototype.render = function render(fn) {
     }
   }, function rendered(err, html) {
     if (err) return fn(err);
+    if (html) write(source.cache, html);
 
     fn(undefined, (source.html = html));
   });
