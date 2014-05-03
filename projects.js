@@ -3,6 +3,7 @@
 var Pagelet = require('bigpipe').Pagelet
   , lexer = require('marked').lexer
   , renderme = require('renderme')
+  , crypto = require('crypto')
   , path = require('path')
   , fs = require('fs');
 
@@ -27,11 +28,16 @@ function Source(name, remove) {
   var directory = path.dirname(require.resolve(name));
 
   this.json = require(path.join(directory, 'package.json'));
-  this.cache = path.join(__dirname, 'cache', name +'.html');
   this.file = path.join(directory, 'README.md');
   this.content = read(this.file, 'utf-8');
   this.tableofcontents = null;
   this.name = name;
+
+  //
+  // Create unique filenames based the MD5 of the content.
+  //
+  var md5 = crypto.createHash('md5').update(this.content).digest('hex');
+  this.cache = path.join(__dirname, 'cache', md5 +'.html');
 
   try { this.html = read(this.cache, 'utf-8'); }
   catch (e) { this.html = ''; }
