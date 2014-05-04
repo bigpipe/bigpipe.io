@@ -1,6 +1,6 @@
 {
   "name": "bigpipe.io",
-  "version": "0.0.0-4",
+  "version": "0.0.0-7",
   "description": "The documentation site on http://bigpipe.io",
   "main": "index.js",
   "scripts": {
@@ -31,6 +31,10 @@
     "ejs": "1.0.x"
   },
   "subdomain": "bigpipe",
+  "domains": [
+    "bigpipe.io"
+    "www.bigpipe.io",
+  ],
   "engines": {
     "node": "0.10.x"
   }
