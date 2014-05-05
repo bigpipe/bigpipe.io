@@ -67,7 +67,8 @@ Source.prototype.render = function render(fn) {
     }
   }, function rendered(err, html) {
     if (err) return fn(err);
-    if (html) write(source.cache, html);
+    if (html) try { write(source.cache, html); }
+    catch (e) {}
 
     fn(undefined, (source.html = html));
   });
