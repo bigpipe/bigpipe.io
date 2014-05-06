@@ -1,0 +1,520 @@
+<h1><a name="bigpipe-a-href-https-travis-ciorg-bigpipe-bigpipe-img-src-https-travis-ciorg-bigpipe-bigpipepng-alt-build-status-a-a-href-http-badgefuryio-js-bigpipe-img-src-https-badgefuryio-js-bigpipepng-alt-npm-version-a-a-href-http-coverallsio-r-bigpipe-bigpipe-branch-master-img-src-http-coverallsio-repos-bigpipe-bigpipe-badgepng-branch-master-alt-coverage-status-a" class="anchor" href="#bigpipe-a-href-https-travis-ciorg-bigpipe-bigpipe-img-src-https-travis-ciorg-bigpipe-bigpipepng-alt-build-status-a-a-href-http-badgefuryio-js-bigpipe-img-src-https-badgefuryio-js-bigpipepng-alt-npm-version-a-a-href-http-coverallsio-r-bigpipe-bigpipe-branch-master-img-src-http-coverallsio-repos-bigpipe-bigpipe-badgepng-branch-master-alt-coverage-status-a"></a>BigPipe <a href="https://travis-ci.org/bigpipe/bigpipe"><img src="https://travis-ci.org/bigpipe/bigpipe.png" alt="Build Status"></a> <a href="http://badge.fury.io/js/bigpipe"><img src="https://badge.fury.io/js/bigpipe.png" alt="NPM version"></a> <a href="http://coveralls.io/r/bigpipe/bigpipe?branch=master"><img src="http://coveralls.io/repos/bigpipe/bigpipe/badge.png?branch=master" alt="Coverage Status"></a></h1>
+<p>BigPipe is a radical new web framework that is inspired by the concept behind
+Facebook&#39;s BigPipe. The general idea is to decompose web pages in to small
+re-usable chunks of functionality called <code>Pagelets</code> and pipeline them through
+several execution stages inside web servers and browsers. This allows progressive
+rendering at the front-end and results in exceptional front-end performance.</p>
+<p>Most web frameworks are based on request and response pattern, a request comes
+in, we process the data and output a template. But before we can output the
+template we have to wait until all data has been received in order for the
+template to be processed. This doesn&#39;t make any sense for Node.js applications
+where everything everything is done asynchronous. When received your first batch
+of data, why not send it directly to the browser so it can start downloading the
+required CSS, JavaScript and render it.</p>
+<h2><a name="installation" class="anchor" href="#installation"></a>Installation</h2>
+<p>BigPipe is distributed through the node package manager (npm) and is written
+against Node.js 0.10.x.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-1-1">1</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-1-1"></a>npm install --save bigpipe
+</pre></div>
+</td></tr></table><h2><a name="support" class="anchor" href="#support"></a>Support</h2>
+<p>Got stuck? Or can&#39;t wrap your head around a concept or just want some feedback,
+we got a dedicated IRC channel for that on Freenode:</p>
+<ul>
+<li><strong>IRC Server</strong>: <code>irc.freenode.net</code></li>
+<li><strong>IRC Room</strong>: <code>#bigpipe</code></li>
+</ul>
+<p>Still stuck? Create an issue. Every question you have is a bug in our
+documentation and that should be corrected. So please, don&#39;t hesitate to create
+issues, many of them.</p>
+<h3><a name="getting-started" class="anchor" href="#getting-started"></a>Getting started</h3>
+<p>In all of these example we assume that your file is setup as:</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-2-1">1</a>
+<a href="#snippet-2-2">2</a>
+<a href="#snippet-2-3">3</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-2-1"></a><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+<a name="snippet-2-2"></a>
+<a name="snippet-2-3"></a><span class="kd">var</span> <span class="nx">BigPipe</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;bigpipe&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><h3><a name="bigpipecreateserver" class="anchor" href="#bigpipecreateserver"></a>BigPipe.createServer()</h3>
+<p><strong>public</strong>, <em>returns BigPipe</em>.</p>
+<p>To create a BigPipe powered server can simply call the <code>createServer</code> method.
+This creates an HTTP or HTTPS server based on the options provided.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-3-1">1</a>
+<a href="#snippet-3-2">2</a>
+<a href="#snippet-3-3">3</a>
+<a href="#snippet-3-4">4</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-3-1"></a><span class="kd">var</span> <span class="nx">bigpipe</span> <span class="o">=</span> <span class="nx">BigPipe</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="mi">8080</span><span class="p">,</span> <span class="p">{</span>
+<a name="snippet-3-2"></a>  <span class="nx">pages</span><span class="o">:</span> <span class="nx">__dirname</span> <span class="o">+</span><span class="s1">&#39;/pages&#39;</span><span class="p">,</span>
+<a name="snippet-3-3"></a>  <span class="nx">dist</span><span class="o">:</span>  <span class="nx">__dirname</span> <span class="o">+</span><span class="s1">&#39;/dist&#39;</span>
+<a name="snippet-3-4"></a><span class="p">});</span>
+</pre></div>
+</td></tr></table><p>The first argument in the function call is port number you want the server the
+listen on. The second argument is an object with the configuration/options of the
+BigPipe server. The following options are supported:</p>
+<ul>
+<li><strong>cache</strong> A cache which is used for storing URL lookups. This cache instance
+should have a <code>.get(key)</code> and <code>.set(key, value)</code> method. Defaults to <code>false</code></li>
+<li><strong>dist</strong> The location of our folder where we can store our compiled CSS and
+JavaScript to disk. If the path or folder does not exist it will be
+automatically created. Defaults to <code>working dir/dist</code>.</li>
+<li><strong>domain</strong> Use Node&#39;s domains when processing requests so errors are handled
+by BigPipe. Defaults to <code>true</code> if domains are supported, <code>false</code> if domains
+are not supported.</li>
+<li><strong>pages</strong> A directory that contains your Page definitions or an array of Page
+constructors. Defaults to <code>working dir/dist</code>. If you don&#39;t provide Pages it
+will serve a 404 page for every request.</li>
+<li><strong>parser</strong> The message parser we should use for our real-time communication.
+See <a href="https://github.com/primus/primus">Primus</a> for the available parsers. Defaults to <code>JSON</code>.</li>
+<li><strong>pathname</strong> The root path of an URL that we can use our real-time
+communication. This path should not be used by your Pages. Defaults to
+<code>/pagelet</code></li>
+<li><strong>transformer</strong> The transformer or real-time framework we should for the
+real-time communication. We&#39;re bundling and using <code>ws</code> by default. See <a href="https://github.com/primus/primus">Primus</a>
+for the supported transformers. Please note that you do need to add the
+transformer dependency to your <code>package.json</code> when you choose something else
+than <code>ws</code>.</li>
+<li><strong>redirect</strong> When creating a HTTPS server you could automatically start a HTTP
+server which redirects all traffic to the HTTPS equiv. The value is the port
+number on which this server should be started. Defaults to <code>false</code>.</li>
+</ul>
+<p>In addition to the options above, all options of a HTTPS server are also
+supported.  When you provide the server with cert and key files or set the
+port number to <code>443</code> it assumes you want to setup up a HTTPS server instead.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-4-1">1</a>
+<a href="#snippet-4-2">2</a>
+<a href="#snippet-4-3">3</a>
+<a href="#snippet-4-4">4</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-4-1"></a><span class="kd">var</span> <span class="nx">bigpipe</span> <span class="o">=</span> <span class="nx">BigPipe</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="mi">443</span><span class="p">,</span> <span class="p">{</span>
+<a name="snippet-4-2"></a>  <span class="nx">key</span><span class="o">:</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span><span class="s1">&#39;/ssl.key&#39;</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+<a name="snippet-4-3"></a>  <span class="nx">cert</span><span class="o">:</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span><span class="s1">&#39;/ssl.cert&#39;</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+<a name="snippet-4-4"></a><span class="p">});</span>
+</pre></div>
+</td></tr></table><p>When you&#39;re creating an HTTPS server you got to option to also setup a simple
+HTTP server which redirects all content to HTTPS instead. This is done by
+supplying the <code>redirect</code> property in the options. The value of this property
+should be the port number you want this HTTP server to listen on:</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-5-1">1</a>
+<a href="#snippet-5-2">2</a>
+<a href="#snippet-5-3">3</a>
+<a href="#snippet-5-4">4</a>
+<a href="#snippet-5-5">5</a>
+<a href="#snippet-5-6">6</a>
+<a href="#snippet-5-7">7</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-5-1"></a><span class="kd">var</span> <span class="nx">bigpipe</span> <span class="o">=</span> <span class="nx">BigPipe</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="mi">443</span><span class="p">,</span> <span class="p">{</span>
+<a name="snippet-5-2"></a>  <span class="p">..</span>
+<a name="snippet-5-3"></a>
+<a name="snippet-5-4"></a>  <span class="nx">key</span><span class="o">:</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span><span class="s1">&#39;/ssl.key&#39;</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+<a name="snippet-5-5"></a>  <span class="nx">cert</span><span class="o">:</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span><span class="s1">&#39;/ssl.cert&#39;</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+<a name="snippet-5-6"></a>  <span class="nx">redirect</span><span class="o">:</span> <span class="mi">80</span>
+<a name="snippet-5-7"></a><span class="p">});</span>
+</pre></div>
+</td></tr></table><h3><a name="new-bigpipe" class="anchor" href="#new-bigpipe"></a>new BigPipe()</h3>
+<p><strong>public</strong>, <em>returns BigPipe</em>.</p>
+<p>If you want more control over the server creation process you can manually
+create a HTTP or HTTPS server and supply it to the BigPipe constructor.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-6-1">1</a>
+<a href="#snippet-6-2">2</a>
+<a href="#snippet-6-3">3</a>
+<a href="#snippet-6-4">4</a>
+<a href="#snippet-6-5">5</a>
+<a href="#snippet-6-6">6</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-6-1"></a><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+<a name="snippet-6-2"></a>
+<a name="snippet-6-3"></a><span class="kd">var</span> <span class="nx">server</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">).</span><span class="nx">createServer</span><span class="p">()</span>
+<a name="snippet-6-4"></a>  <span class="p">,</span> <span class="nx">BigPipe</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;bigpipe&#39;</span><span class="p">);</span>
+<a name="snippet-6-5"></a>
+<a name="snippet-6-6"></a><span class="kd">var</span> <span class="nx">bigpipe</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">BigPipe</span><span class="p">(</span><span class="nx">server</span><span class="p">,</span> <span class="p">{</span> <span class="nx">options</span> <span class="p">});</span>
+</pre></div>
+</td></tr></table><p>If you are using this pattern to create a BigPipe server instance you need to
+use the <code>bigpipe.listen</code> method to listen to the server. When this is called we
+will start our compiling all assets, attach the correct listeners to the
+supplied server, attach event listeners and finally listen on the server. The
+first argument of this method is the port number you want to listen on, the
+second argument is an optional callback function that should be called when
+server is listening for requests.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-7-1">1</a>
+<a href="#snippet-7-2">2</a>
+<a href="#snippet-7-3">3</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-7-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">8080</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">listening</span><span class="p">()</span> <span class="p">{</span>
+<a name="snippet-7-2"></a>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;hurray, we are listening on port 8080&#39;</span><span class="p">);</span>
+<a name="snippet-7-3"></a><span class="p">});</span>
+</pre></div>
+</td></tr></table><h3><a name="bigpipeversion" class="anchor" href="#bigpipeversion"></a>BigPipe.version</h3>
+<p><strong>public</strong>, <em>returns string</em>.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-8-1">1</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-8-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">version</span><span class="p">;</span>
+</pre></div>
+</td></tr></table><p>The current version of the BigPipe framework that is running.</p>
+<h3><a name="bigpipedefine" class="anchor" href="#bigpipedefine"></a>BigPipe.define()</h3>
+<p><strong>public</strong>, <em>returns BigPipe</em>.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-9-1">1</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-9-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">define</span><span class="p">(</span><span class="nx">pages</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><p>Merge page or pages in the collection of existing pages. If given a string it
+will search that directly for the available Page files. After all dependencies
+have been compiled the supplied callback is called.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-10-1">1</a>
+<a href="#snippet-10-2">2</a>
+<a href="#snippet-10-3">3</a>
+<a href="#snippet-10-4">4</a>
+<a href="#snippet-10-5">5</a>
+<a href="#snippet-10-6">6</a>
+<a href="#snippet-10-7">7</a>
+<a href="#snippet-10-8">8</a>
+<a href="#snippet-10-9">9</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-10-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">define</span><span class="p">(</span><span class="s1">&#39;../pages&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">done</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+<a name="snippet-10-2"></a>
+<a name="snippet-10-3"></a><span class="p">});</span>
+<a name="snippet-10-4"></a>
+<a name="snippet-10-5"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">define</span><span class="p">([</span><span class="nx">Page</span><span class="p">,</span> <span class="nx">Page</span><span class="p">,</span> <span class="nx">Page</span><span class="p">],</span> <span class="kd">function</span> <span class="nx">done</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+<a name="snippet-10-6"></a>
+<a name="snippet-10-7"></a><span class="p">}).</span><span class="nx">define</span><span class="p">(</span><span class="s1">&#39;../more/pages&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">done</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+<a name="snippet-10-8"></a>
+<a name="snippet-10-9"></a><span class="p">});</span>
+</pre></div>
+</td></tr></table><h3><a name="bigpipebefore" class="anchor" href="#bigpipebefore"></a>BigPipe.before()</h3>
+<p><strong>public</strong>, <em>returns BigPipe</em>.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-11-1">1</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-11-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">before</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><p>BigPipe has two ways of extending it&#39;s build-in functionality, we have plugins
+but also middleware layers. The important difference between these is that
+middleware layers allow you modify the incoming requests <strong>before</strong> they are
+used by BigPipe.</p>
+<p>There are 2 different kinds of middleware layers, <strong>async</strong> and <strong>sync</strong>. The
+main difference is that the <strong>sync</strong> middleware doesn&#39;t require a callback. It&#39;s
+completely optional and ideal for just introducing or modifying the properties
+on a request or response object.</p>
+<p>All middleware layers need to be named, this allows you to enable, disable or
+remove the middleware layers. The supplied middleware function can either be a
+pre-configured function that is ready to modify the request and responses:</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-12-1">1</a>
+<a href="#snippet-12-2">2</a>
+<a href="#snippet-12-3">3</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-12-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">before</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+<a name="snippet-12-2"></a>  <span class="nx">req</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="s1">&#39;bar&#39;</span><span class="p">;</span>
+<a name="snippet-12-3"></a><span class="p">});</span>
+</pre></div>
+</td></tr></table><p>Or an unconfigured function. We assume that a function is unconfigured if the
+supplied function has less than <strong>2</strong> arguments. When we detect these function
+we automatically call the function with the context that is set to <code>BigPipe</code> and
+the supplied options object and assume that it returns a configured middleware
+layer.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-13-1">1</a>
+<a href="#snippet-13-2">2</a>
+<a href="#snippet-13-3">3</a>
+<a href="#snippet-13-4">4</a>
+<a href="#snippet-13-5">5</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-13-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">before</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">configure</span><span class="p">)</span> <span class="p">{</span>
+<a name="snippet-13-2"></a>  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+<a name="snippet-13-3"></a>    <span class="nx">res</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="nx">configure</span><span class="p">.</span><span class="nx">foo</span><span class="p">;</span>
+<a name="snippet-13-4"></a>  <span class="p">};</span>
+<a name="snippet-13-5"></a><span class="p">},</span> <span class="p">{</span> <span class="nx">foo</span><span class="o">:</span> <span class="s1">&#39;bar&#39;</span> <span class="p">});</span>
+</pre></div>
+</td></tr></table><p>If you&#39;re building async middleware layers, you simply need to make sure that
+your function accepts 3 arguments:</p>
+<ul>
+<li><strong>req</strong> The incoming HTTP request.</li>
+<li><strong>req</strong> The outgoing HTTP response.</li>
+<li><strong>next</strong> The continuation callback function. This function follows the error
+first callback pattern.</li>
+</ul>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-14-1">1</a>
+<a href="#snippet-14-2">2</a>
+<a href="#snippet-14-3">3</a>
+<a href="#snippet-14-4">4</a>
+<a href="#snippet-14-5">5</a>
+<a href="#snippet-14-6">6</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-14-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">before</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+<a name="snippet-14-2"></a>  <span class="nx">asyncthings</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+<a name="snippet-14-3"></a>    <span class="nx">req</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="nx">data</span><span class="p">;</span>
+<a name="snippet-14-4"></a>    <span class="nx">next</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+<a name="snippet-14-5"></a>  <span class="p">});</span>
+<a name="snippet-14-6"></a><span class="p">});</span>
+</pre></div>
+</td></tr></table><h3><a name="bigpiperemove" class="anchor" href="#bigpiperemove"></a>BigPipe.remove()</h3>
+<p><strong>public</strong>, <em>returns BigPipe</em>.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-15-1">1</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-15-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="nx">name</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><p>Removes a middleware layer from the stack based on the given name.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-16-1">1</a>
+<a href="#snippet-16-2">2</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-16-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">before</span><span class="p">(</span><span class="s1">&#39;layer&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{});</span>
+<a name="snippet-16-2"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="s1">&#39;layer&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><h3><a name="bigpipedisable" class="anchor" href="#bigpipedisable"></a>BigPipe.disable()</h3>
+<p><strong>public</strong>, <em>returns BigPipe</em>.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-17-1">1</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-17-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">disable</span><span class="p">(</span><span class="nx">name</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><p>Temporarily disable a middleware layer, it&#39;s not removed from the stack but it&#39;s
+just skipped when we iterate over the middleware layers. When a middleware layer
+has been disabled you can re-enable it.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-18-1">1</a>
+<a href="#snippet-18-2">2</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-18-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">before</span><span class="p">(</span><span class="s1">&#39;layer&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{});</span>
+<a name="snippet-18-2"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">disable</span><span class="p">(</span><span class="s1">&#39;layer&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><h3><a name="bigpipeenable" class="anchor" href="#bigpipeenable"></a>BigPipe.enable()</h3>
+<p><strong>public</strong>, <em>returns BigPipe</em>.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-19-1">1</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-19-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">enable</span><span class="p">(</span><span class="nx">name</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><p>Re-Enable a previously disabled module.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-20-1">1</a>
+<a href="#snippet-20-2">2</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-20-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">disable</span><span class="p">(</span><span class="s1">&#39;layer&#39;</span><span class="p">);</span>
+<a name="snippet-20-2"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">enable</span><span class="p">(</span><span class="s1">&#39;layer&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><h3><a name="bigpipeuse" class="anchor" href="#bigpipeuse"></a>BigPipe.use()</h3>
+<p><strong>public</strong>, <em>returns BigPipe</em>.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-21-1">1</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-21-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">plugin</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><p>Plugins can be used to extend the functionality of BigPipe it self. You can
+control the client code as well as the server side code of BigPipe using the
+plugin interface.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-22-1"> 1</a>
+<a href="#snippet-22-2"> 2</a>
+<a href="#snippet-22-3"> 3</a>
+<a href="#snippet-22-4"> 4</a>
+<a href="#snippet-22-5"> 5</a>
+<a href="#snippet-22-6"> 6</a>
+<a href="#snippet-22-7"> 7</a>
+<a href="#snippet-22-8"> 8</a>
+<a href="#snippet-22-9"> 9</a>
+<a href="#snippet-22-10">10</a>
+<a href="#snippet-22-11">11</a>
+<a href="#snippet-22-12">12</a>
+<a href="#snippet-22-13">13</a>
+<a href="#snippet-22-14">14</a>
+<a href="#snippet-22-15">15</a>
+<a href="#snippet-22-16">16</a>
+<a href="#snippet-22-17">17</a>
+<a href="#snippet-22-18">18</a>
+<a href="#snippet-22-19">19</a>
+<a href="#snippet-22-20">20</a>
+<a href="#snippet-22-21">21</a>
+<a href="#snippet-22-22">22</a>
+<a href="#snippet-22-23">23</a>
+<a href="#snippet-22-24">24</a>
+<a href="#snippet-22-25">25</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-22-1"></a><span class="nx">bigpipe</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="s1">&#39;ack&#39;</span><span class="p">,</span> <span class="p">{</span>
+<a name="snippet-22-2"></a>  <span class="c1">//</span>
+<a name="snippet-22-3"></a>  <span class="c1">// Only ran on the server.</span>
+<a name="snippet-22-4"></a>  <span class="c1">//</span>
+<a name="snippet-22-5"></a>  <span class="nx">server</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">bigpipe</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+<a name="snippet-22-6"></a>     <span class="c1">// do stuff</span>
+<a name="snippet-22-7"></a>  <span class="p">},</span>
+<a name="snippet-22-8"></a>
+<a name="snippet-22-9"></a>  <span class="c1">//</span>
+<a name="snippet-22-10"></a>  <span class="c1">// Runs on the client, it&#39;s automatically bundled.</span>
+<a name="snippet-22-11"></a>  <span class="c1">//</span>
+<a name="snippet-22-12"></a>  <span class="nx">client</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">bigpipe</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+<a name="snippet-22-13"></a>     <span class="c1">// do client stuff</span>
+<a name="snippet-22-14"></a>  <span class="p">},</span>
+<a name="snippet-22-15"></a>
+<a name="snippet-22-16"></a>  <span class="c1">//</span>
+<a name="snippet-22-17"></a>  <span class="c1">// Optional library that needs to be bundled on the client (should be a string)</span>
+<a name="snippet-22-18"></a>  <span class="c1">//</span>
+<a name="snippet-22-19"></a>  <span class="nx">library</span><span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+<a name="snippet-22-20"></a>
+<a name="snippet-22-21"></a>  <span class="c1">//</span>
+<a name="snippet-22-22"></a>  <span class="c1">// Optional plugin specific options, will be merged with Bigpipe.options</span>
+<a name="snippet-22-23"></a>  <span class="c1">//</span>
+<a name="snippet-22-24"></a>  <span class="nx">options</span><span class="o">:</span> <span class="p">{}</span>
+<a name="snippet-22-25"></a><span class="p">});</span>
+</pre></div>
+</td></tr></table><h3><a name="pagepath" class="anchor" href="#pagepath"></a>Page.path</h3>
+<p><em>required:</em> <strong>writable, string</strong></p>
+<p>The HTTP pathname or URL we that we should respond to. The routing make use of
+the <a href="https://github.com/bigpipe/routable">routable</a> module for all of it&#39;s path
+matching. This allows you to use:</p>
+<ul>
+<li><strong>plain strings:</strong> <code>&#39;/foo/bar&#39;</code></li>
+<li><strong>capturing strings:</strong> <code>&#39;/foo/:bar&#39;</code></li>
+<li><strong>regexp</strong>: <code>/^\/foo\/bar$/</code></li>
+<li><strong>capturing regexp</strong>: <code>/^\/(foo|bar)\/bar$/</code></li>
+<li><strong>xRegExp</strong>: <code>&#39;/^\\/(?&lt;named&gt;[\\d\\.]+)\\/foo/&#39;</code></li>
+</ul>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-23-1">1</a>
+<a href="#snippet-23-2">2</a>
+<a href="#snippet-23-3">3</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-23-1"></a><span class="nx">Page</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<a name="snippet-23-2"></a>  <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span>
+<a name="snippet-23-3"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><h3><a name="pageview" class="anchor" href="#pageview"></a>Page.view</h3>
+<p><em>required:</em> <strong>writable, string</strong></p>
+<p>The location of the base template which will be flushed to the browser as the
+first chunk of content. In your template we will introduce a <code>bootstrap</code>
+variable that needs to be placed in the <code>&lt;head&gt;</code> of HTML. Make sure when you&#39;re
+outputting this <code>bootstrap</code> variable is that it&#39;s <strong>not</strong> escaping the HTML tags.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-24-1">1</a>
+<a href="#snippet-24-2">2</a>
+<a href="#snippet-24-3">3</a>
+<a href="#snippet-24-4">4</a>
+<a href="#snippet-24-5">5</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-24-1"></a><span class="cp">&lt;!doctype html&gt;</span>
+<a name="snippet-24-2"></a><span class="nt">&lt;html</span> <span class="na">class=</span><span class="s">&quot;no-js&quot;</span><span class="nt">&gt;</span>
+<a name="snippet-24-3"></a><span class="nt">&lt;head&gt;</span>
+<a name="snippet-24-4"></a>  <span class="err">&lt;</span>%- bootstrap %&gt;
+<a name="snippet-24-5"></a><span class="nt">&lt;/head&gt;</span>
+</pre></div>
+</td></tr></table><p>The template engine that you use should be supported by the <a href="https://github.com/bigpipe/temper">temper</a> project. The
+path the template is relative to the location of the Page. So you don&#39;t need to
+the nasty <code>path.join(__dirname, &#39;folder&#39;)</code> &quot;hack&quot; to set the correct template.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-25-1">1</a>
+<a href="#snippet-25-2">2</a>
+<a href="#snippet-25-3">3</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-25-1"></a><span class="nx">Page</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<a name="snippet-25-2"></a>  <span class="nx">view</span><span class="o">:</span> <span class="s1">&#39;../views/index.ejs&#39;</span>
+<a name="snippet-25-3"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><h3><a name="pagecharset" class="anchor" href="#pagecharset"></a>Page.charset</h3>
+<p><em>optional:</em> <strong>writable, string</strong></p>
+<p>The meta character set for the Page. We add a <code>&lt;meta charset=&quot;&quot;&gt;</code> to the bootstrap
+code by default so the browser doesn&#39;t have to do any HTML buffering in order to
+figure out what charset it should render the HTML in.</p>
+<p>When you set this to <code>null</code> it will not include the meta charset, but this it not
+advised.</p>
+<p><strong>Default value</strong>: <code>utf-8</code></p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-26-1">1</a>
+<a href="#snippet-26-2">2</a>
+<a href="#snippet-26-3">3</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-26-1"></a><span class="nx">Page</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<a name="snippet-26-2"></a>  <span class="nx">charset</span><span class="o">:</span> <span class="s1">&#39;UTF-8&#39;</span>
+<a name="snippet-26-3"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><h3><a name="pagecontenttype" class="anchor" href="#pagecontenttype"></a>Page.contentType</h3>
+<p><em>optional:</em> <strong>writable, string</strong></p>
+<p>The Content-Type of the response. This defaults to text/html with a charset
+preset. The charset does not inherit it&#39;s value from the <code>charset</code> option.</p>
+<p><strong>Default value</strong>: <code>text/html; charset=UTF-8</code></p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-27-1">1</a>
+<a href="#snippet-27-2">2</a>
+<a href="#snippet-27-3">3</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-27-1"></a><span class="nx">Page</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<a name="snippet-27-2"></a>  <span class="nx">contentType</span><span class="o">:</span> <span class="err">&#39;</span><span class="nx">text</span><span class="o">/</span><span class="nx">html</span><span class="p">;</span> <span class="nx">charset</span><span class="o">=</span><span class="nx">UTF</span><span class="o">-</span><span class="mi">7</span><span class="err">&quot;</span>
+<a name="snippet-27-3"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><h3><a name="pagemethod" class="anchor" href="#pagemethod"></a>Page.method</h3>
+<p><em>optional:</em> <strong>writable, string or array</strong></p>
+<p>Which HTTP methods should this page accept. It can be string with comma separated
+values or an Array with all the individual methods.</p>
+<p><strong>Default value</strong>: <code>GET</code></p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-28-1">1</a>
+<a href="#snippet-28-2">2</a>
+<a href="#snippet-28-3">3</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-28-1"></a><span class="nx">Page</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<a name="snippet-28-2"></a>  <span class="nx">method</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;HEAD&#39;</span><span class="p">]</span><span class="err">`</span>
+<a name="snippet-28-3"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><p>Or using a string:</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-29-1">1</a>
+<a href="#snippet-29-2">2</a>
+<a href="#snippet-29-3">3</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-29-1"></a><span class="nx">Page</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<a name="snippet-29-2"></a>  <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;GET, POST, HEAD&#39;</span>
+<a name="snippet-29-3"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><h3><a name="pagestatuscode" class="anchor" href="#pagestatuscode"></a>Page.statusCode</h3>
+<p><em>optional:</em> <strong>writable, number</strong></p>
+<p>The default status code that we should send back to the response.</p>
+<p><strong>Default value</strong>: <code>200</code></p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-30-1">1</a>
+<a href="#snippet-30-2">2</a>
+<a href="#snippet-30-3">3</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-30-1"></a><span class="nx">Page</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<a name="snippet-30-2"></a>  <span class="nx">statusCode</span><span class="o">:</span> <span class="mi">416</span>
+<a name="snippet-30-3"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><h3><a name="pageauthorize" class="anchor" href="#pageauthorize"></a>Page.authorize</h3>
+<p><em>optional:</em> <strong>writable, function</strong></p>
+<p>An authorization handler to see if the request is authorized to interact with
+this page. This is set to <code>null</code> by default as there isn&#39;t any
+authorization in place. The authorization function will receive 2 arguments:</p>
+<ul>
+<li><strong>req</strong>: the http request that initialized the pagelet</li>
+<li><strong>done</strong>: a callback function that needs to be called with only a boolean.</li>
+</ul>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-31-1">1</a>
+<a href="#snippet-31-2">2</a>
+<a href="#snippet-31-3">3</a>
+<a href="#snippet-31-4">4</a>
+<a href="#snippet-31-5">5</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-31-1"></a><span class="nx">Page</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<a name="snippet-31-2"></a>  <span class="nx">authorize</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">authorize</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+<a name="snippet-31-3"></a>    <span class="nx">done</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span> <span class="c1">// True indicates that the request is authorized for access.</span>
+<a name="snippet-31-4"></a>  <span class="p">}</span>
+<a name="snippet-31-5"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><h3><a name="pagemode" class="anchor" href="#pagemode"></a>Page.mode</h3>
+<p><em>optional:</em> <strong>writable, string</strong></p>
+<p>What kind of generation mode should we render the pagelets. There are 3 different
+render modes available:</p>
+<ul>
+<li><strong>sync</strong>: Render all the pagelets in a single flush so we don&#39;t rely on
+JavaScript to be active in the browser to put the rendered pagelets in their
+correct positions again. This is set by default if your browser is not
+supporting JavaScript or doesn&#39;t support HTTP 1.1 chunking.</li>
+<li><strong>async</strong>: Render all pagelets as fast as possible and flush them to the
+response once they are done with rendering. The client side would then place
+the pagelets in their correct place holders. There is no pre-defined order
+when we are rendering.</li>
+<li><strong>pipeline</strong>: Almost the same as <strong>async</strong> rendering but the main difference
+is that the pagelets are flushed in the order that we&#39;re defined on the
+<code>pagelet</code> object.</li>
+</ul>
+<p><strong>Default value</strong>: <code>async</code></p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-32-1">1</a>
+<a href="#snippet-32-2">2</a>
+<a href="#snippet-32-3">3</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-32-1"></a><span class="nx">Page</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<a name="snippet-32-2"></a>  <span class="nx">mode</span><span class="o">:</span> <span class="s1">&#39;async&#39;</span>
+<a name="snippet-32-3"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
+</pre></div>
+</td></tr></table><h2><a name="events" class="anchor" href="#events"></a>Events</h2>
+<p>Everything in BigPipe is build upon the EventEmitter interface. It&#39;s either a
+plain EventEmitter or a proper stream. This a summary of the events we emit:</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Usage</th>
+<th>Location</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>log</code></td>
+<td>public</td>
+<td>server</td>
+<td>A new log message</td>
+</tr>
+<tr>
+<td><code>transform::pagelet</code></td>
+<td>public</td>
+<td>server</td>
+<td>Transform a Pagelet</td>
+</tr>
+<tr>
+<td><code>transform::page</code></td>
+<td>public</td>
+<td>server</td>
+<td>Transform a Page</td>
+</tr>
+<tr>
+<td><code>listening</code></td>
+<td>public</td>
+<td>server</td>
+<td>The server is listening</td>
+</tr>
+<tr>
+<td><code>error</code></td>
+<td>public</td>
+<td>server</td>
+<td>The HTTP server received an error</td>
+</tr>
+<tr>
+<td><code>pagelet::configure</code></td>
+<td>public</td>
+<td>server</td>
+<td>A new pagelet has been configured</td>
+</tr>
+<tr>
+<td><code>page::configure</code></td>
+<td>public</td>
+<td>server</td>
+<td>A new page has been configured</td>
+</tr>
+</tbody>
+</table>
+<h2><a name="debugging" class="anchor" href="#debugging"></a>Debugging</h2>
+<p>The library makes use the <code>debug</code> module and has all it&#39;s internals namespaced
+to <code>bigpipe:</code>. These debug messages can be trigged by starting your application
+with the <code>DEBUG=</code> env variable. In order to filter out all messages except
+BigPipe&#39;s message run your server with the following command:</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-33-1">1</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-33-1"></a><span class="nv">DEBUG</span><span class="o">=</span>bigpipe:* node &lt;server.js&gt;
+</pre></div>
+</td></tr></table><p>The following <code>DEBUG</code> namespaces are available:</p>
+<ul>
+<li><code>bigpipe:server</code> The part that handles the request dispatching, page / pagelet
+transformation and more.</li>
+<li><code>bigpipe:page</code> Page generation.</li>
+<li><code>bigpipe:compiler</code> Asset compilation.</li>
+<li><code>bigpipe:primus</code> BigPipe Primus setup.</li>
+<li><code>pagelet:primus</code> Pagelet and Primus interactions</li>
+<li><code>pagelet</code> Pagelet interactions</li>
+</ul>
