@@ -16,7 +16,11 @@ required CSS, JavaScript and render it.</p>
 against Node.js 0.10.x.</p>
 <table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-1-1">1</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-1-1"></a>npm install --save bigpipe
 </pre></div>
-</td></tr></table><h2><a name="support" class="anchor" href="#support"></a>Support</h2>
+</td></tr></table><h2><a name="versioning" class="anchor" href="#versioning"></a>Versioning</h2>
+<p>To keep track of cross module compatibility, the imported components will be synced
+on minor releases. For example, <code>bigpipe@0.5.0</code> will always be compatible with
+<code>pagelet@0.5.0</code> and <code>pipe.js@0.5.0</code>.</p>
+<h2><a name="support" class="anchor" href="#support"></a>Support</h2>
 <p>Got stuck? Or can&#39;t wrap your head around a concept or just want some feedback,
 we got a dedicated IRC channel for that on Freenode:</p>
 <ul>
@@ -370,7 +374,7 @@ preset. The charset does not inherit it&#39;s value from the <code>charset</code
 <table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-27-1">1</a>
 <a href="#snippet-27-2">2</a>
 <a href="#snippet-27-3">3</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-27-1"></a><span class="nx">Page</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-<a name="snippet-27-2"></a>  <span class="nx">contentType</span><span class="o">:</span> <span class="err">&#39;</span><span class="nx">text</span><span class="o">/</span><span class="nx">html</span><span class="p">;</span> <span class="nx">charset</span><span class="o">=</span><span class="nx">UTF</span><span class="o">-</span><span class="mi">7</span><span class="err">&quot;</span>
+<a name="snippet-27-2"></a>  <span class="nx">contentType</span><span class="o">:</span> <span class="s1">&#39;text/html; charset=UTF-7&#39;</span>
 <a name="snippet-27-3"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
 </pre></div>
 </td></tr></table><h3><a name="pagemethod" class="anchor" href="#pagemethod"></a>Page.method</h3>
@@ -401,6 +405,20 @@ values or an Array with all the individual methods.</p>
 <a name="snippet-30-2"></a>  <span class="nx">statusCode</span><span class="o">:</span> <span class="mi">416</span>
 <a name="snippet-30-3"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
 </pre></div>
+</td></tr></table><h3><a name="pagedata" class="anchor" href="#pagedata"></a>Page.data</h3>
+<p><em>optional:</em> <strong>writable, object</strong></p>
+<p>Optional data that is passed through to the template renderer when rendering
+the view associated with this page.</p>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-31-1">1</a>
+<a href="#snippet-31-2">2</a>
+<a href="#snippet-31-3">3</a>
+<a href="#snippet-31-4">4</a>
+<a href="#snippet-31-5">5</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-31-1"></a><span class="nx">Page</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<a name="snippet-31-2"></a>  <span class="nx">data</span><span class="o">:</span> <span class="p">{</span>
+<a name="snippet-31-3"></a>    <span class="nx">timestamp</span><span class="o">:</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span>
+<a name="snippet-31-4"></a>  <span class="p">}</span>
+<a name="snippet-31-5"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
+</pre></div>
 </td></tr></table><h3><a name="pageauthorize" class="anchor" href="#pageauthorize"></a>Page.authorize</h3>
 <p><em>optional:</em> <strong>writable, function</strong></p>
 <p>An authorization handler to see if the request is authorized to interact with
@@ -410,15 +428,15 @@ authorization in place. The authorization function will receive 2 arguments:</p>
 <li><strong>req</strong>: the http request that initialized the pagelet</li>
 <li><strong>done</strong>: a callback function that needs to be called with only a boolean.</li>
 </ul>
-<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-31-1">1</a>
-<a href="#snippet-31-2">2</a>
-<a href="#snippet-31-3">3</a>
-<a href="#snippet-31-4">4</a>
-<a href="#snippet-31-5">5</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-31-1"></a><span class="nx">Page</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-<a name="snippet-31-2"></a>  <span class="nx">authorize</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">authorize</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
-<a name="snippet-31-3"></a>    <span class="nx">done</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span> <span class="c1">// True indicates that the request is authorized for access.</span>
-<a name="snippet-31-4"></a>  <span class="p">}</span>
-<a name="snippet-31-5"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-32-1">1</a>
+<a href="#snippet-32-2">2</a>
+<a href="#snippet-32-3">3</a>
+<a href="#snippet-32-4">4</a>
+<a href="#snippet-32-5">5</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-32-1"></a><span class="nx">Page</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<a name="snippet-32-2"></a>  <span class="nx">authorize</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">authorize</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+<a name="snippet-32-3"></a>    <span class="nx">done</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span> <span class="c1">// True indicates that the request is authorized for access.</span>
+<a name="snippet-32-4"></a>  <span class="p">}</span>
+<a name="snippet-32-5"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
 </pre></div>
 </td></tr></table><h3><a name="pagemode" class="anchor" href="#pagemode"></a>Page.mode</h3>
 <p><em>optional:</em> <strong>writable, string</strong></p>
@@ -438,11 +456,11 @@ is that the pagelets are flushed in the order that we&#39;re defined on the
 <code>pagelet</code> object.</li>
 </ul>
 <p><strong>Default value</strong>: <code>async</code></p>
-<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-32-1">1</a>
-<a href="#snippet-32-2">2</a>
-<a href="#snippet-32-3">3</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-32-1"></a><span class="nx">Page</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-<a name="snippet-32-2"></a>  <span class="nx">mode</span><span class="o">:</span> <span class="s1">&#39;async&#39;</span>
-<a name="snippet-32-3"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-33-1">1</a>
+<a href="#snippet-33-2">2</a>
+<a href="#snippet-33-3">3</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-33-1"></a><span class="nx">Page</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+<a name="snippet-33-2"></a>  <span class="nx">mode</span><span class="o">:</span> <span class="s1">&#39;async&#39;</span>
+<a name="snippet-33-3"></a><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="nx">module</span><span class="p">);</span>
 </pre></div>
 </td></tr></table><h2><a name="events" class="anchor" href="#events"></a>Events</h2>
 <p>Everything in BigPipe is build upon the EventEmitter interface. It&#39;s either a
@@ -506,7 +524,7 @@ plain EventEmitter or a proper stream. This a summary of the events we emit:</p>
 to <code>bigpipe:</code>. These debug messages can be trigged by starting your application
 with the <code>DEBUG=</code> env variable. In order to filter out all messages except
 BigPipe&#39;s message run your server with the following command:</p>
-<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-33-1">1</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-33-1"></a><span class="nv">DEBUG</span><span class="o">=</span>bigpipe:* node &lt;server.js&gt;
+<table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-34-1">1</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-34-1"></a><span class="nv">DEBUG</span><span class="o">=</span>bigpipe:* node &lt;server.js&gt;
 </pre></div>
 </td></tr></table><p>The following <code>DEBUG</code> namespaces are available:</p>
 <ul>
