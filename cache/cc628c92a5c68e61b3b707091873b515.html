@@ -82,32 +82,32 @@ this message.</p>
 <td>A pagelet has been removed.</td>
 </tr>
 <tr>
-<td><code>&lt;name&gt;::error</code></td>
+<td><code>&lt;name&gt;:error</code></td>
 <td>Pagelet, Error</td>
 <td>We&#39;ve failed to load the Pagelet.</td>
 </tr>
 <tr>
-<td><code>&lt;name&gt;::loaded</code></td>
+<td><code>&lt;name&gt;:loaded</code></td>
 <td>Pagelet</td>
 <td>All assets have been loaded.</td>
 </tr>
 <tr>
-<td><code>&lt;name&gt;::configure</code></td>
+<td><code>&lt;name&gt;:configure</code></td>
 <td>Pagelet, Data object</td>
 <td>Pagelet has been configured.</td>
 </tr>
 <tr>
-<td><code>&lt;name&gt;::initialise</code></td>
+<td><code>&lt;name&gt;:initialize</code></td>
 <td>Pagelet</td>
-<td>Pagelet has been initialised.</td>
+<td>Pagelet has been initialized.</td>
 </tr>
 <tr>
-<td><code>&lt;name&gt;::render</code></td>
+<td><code>&lt;name&gt;:render</code></td>
 <td>Pagelet, html</td>
 <td>Rendered the HTML.</td>
 </tr>
 <tr>
-<td><code>&lt;name&gt;::destroy</code></td>
+<td><code>&lt;name&gt;:destroy</code></td>
 <td>Pagelet</td>
 <td>Pagelet has been destroyed.</td>
 </tr>
@@ -263,7 +263,7 @@ Pagelets over one single real-time connection.</li>
 <li>We&#39;ll find the HTML that needs to be rendered using the <code>Pagelet.parse</code> and
 render it in the placeholders using <code>Pagelet.render(html)</code></li>
 <li>The render method emits <code>render</code>.</li>
-<li>Finally everything is done and emit the <code>initialise</code> event.</li>
+<li>Finally everything is done and emit the <code>initialize</code> event.</li>
 </ol>
 <p>Congratulations you&#39;ve read through the whole configuration process of a
 pagelet. Hopefully this makes everything a bit more clear on how they work.</p>
@@ -295,9 +295,9 @@ emitted by the Pagelet:</p>
 <td>Pagelet has been configured.</td>
 </tr>
 <tr>
-<td><code>initialise</code></td>
+<td><code>initialize</code></td>
 <td></td>
-<td>Pagelet has been initialised.</td>
+<td>Pagelet has been initialized.</td>
 </tr>
 <tr>
 <td><code>render</code></td>
@@ -377,9 +377,9 @@ server.</p>
 </pre></div>
 </td></tr></table><p>Broadcast an event to this Pagelet instance as well as the BigPipe instance
 that created the Pagelet. Before emitting the event on the BigPipe instance it
-prefixes the event with the name of the Pagelet and <code>::</code>. If the name of your
+prefixes the event with the name of the Pagelet and <code>:</code>. If the name of your
 Pagelet is <code>foo</code> and you emit event <code>bar</code> the BigPipe instance will emit
-<code>foo::bar</code> as event.</p>
+<code>foo:bar</code> as event.</p>
 <table class="rendermetable"><tr><td class="linenos"><div class="linenodiv"><pre><a href="#snippet-21-1">1</a></pre></div></td><td class="code"><div class="renderme"><pre><a name="snippet-21-1"></a><span class="nx">pagelet</span><span class="p">.</span><span class="nx">broadcast</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">);</span>
 </pre></div>
 </td></tr></table><h3><a name="pagelet" class="anchor" href="#pagelet"></a>Pagelet#$</h3>
