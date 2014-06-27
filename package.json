@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/bigpipe/bigpipe.io",
   "dependencies": {
-    "pipe.js": "git://github.com/bigpipe/pipe.js",
+    "bigpipe.js": "git://github.com/bigpipe/bigpipe.js",
     "pagelet": "git://github.com/bigpipe/pagelet",
     "bigpipe": "git://github.com/bigpipe/bigpipe",
     "renderme": "0.1.x",

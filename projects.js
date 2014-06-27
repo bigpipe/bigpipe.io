@@ -178,7 +178,7 @@ Source.prototype.toc = function toc() {
 Source.components = {
   'bigpipe': new Source('bigpipe', ['license', 'testing', 'table of contents']),
   'pagelet': new Source('pagelet', ['installation', 'license', 'table of contents']),
-  'client': new Source('pipe.js', ['installation', 'license', 'table of contents'])
+  'client': new Source('bigpipe.js', ['installation', 'license', 'table of contents'])
 };
 
 /**
