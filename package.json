@@ -1,6 +1,6 @@
 {
   "name": "bigpipe.io",
-  "version": "0.0.0-17",
+  "version": "0.0.0-20",
   "description": "The documentation site on http://bigpipe.io",
   "main": "index.js",
   "scripts": {
@@ -30,6 +30,9 @@
     "marked": "0.3.x",
     "ejs": "1.0.x"
   },
+  "bundledDependencies": [
+    "bigpipe.js"
+  ],
   "subdomain": "bigpipe",
   "domains": [
     "bigpipe.io",
