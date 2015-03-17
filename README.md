@@ -1,3 +1,13 @@
+```
+DEPRECATION WARNING:
+
+We are moving away from this bigpipe.io project towards a fully github and git based 
+documentation site which will be hosted through GitHub pages so we can more easily 
+update and deploy the documentation site. The new project lives in:
+
+https://github.com/bigpipe/bigpipe.github.io
+```
+
 # bigpipe.io
 
 This is the site that runs on `bigpipe.io`. Which is basically a bunch of pagelets that
