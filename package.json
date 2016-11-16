@@ -28,7 +28,7 @@
     "bigpipe": "git://github.com/bigpipe/bigpipe",
     "renderme": "0.1.x",
     "marked": "0.3.x",
-    "ejs": "1.0.x"
+    "ejs": "~2.5.2"
   },
   "bundledDependencies": [
     "bigpipe.js"
